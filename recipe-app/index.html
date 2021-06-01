@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>Recipe App</title>
+        <link href="/styles/styles.css" rel="stylesheet">
+    </head>
+    
+        <body>
+            <div class="header">
+                <div class="container">
+                    <h class="header__title">Recipe App</h1>
+                    <h2 class="header__subtitle">Help organize your recipes!</h2>
+                </div>
+            </div>
+            <div class="actions">
+                <div class="actions__container">
+                    <input id="search-text" type="text" class="input" placeholder="Filter notes">
+                    <select id="filter-by" class="dropdown">
+                        <option value="byEdited">Sort by last edited</option>
+                        <option value="byCreated">Sort by recently created</option>
+                        <option value="alphabetical">Sort alphabetically</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="container">
+                <div id="notes"></div>
+                <button id="create-note" class="button"> Create New Recipe</button>
+            </div>
+
+            <script src="/scripts/uuid.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment-with-locales.min.js"></script>
+            <script src="/scripts/notes-functions.js"></script>
+            <script src="/scripts/notes-app.js"></script>
+        </body>
+    
+</html>
