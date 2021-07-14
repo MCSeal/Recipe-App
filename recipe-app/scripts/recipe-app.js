@@ -6,21 +6,21 @@
 //%85 percent done
 
 
-let notes= getSavedNotes()
+let recipes= getSavedRecipes()
 
 const filters = {
     searchText: '',
     sortBy: 'byEdited'
 }
 
-renderNotes(notes, filters)
+renderRecipes(recipes, filters)
 
-//add to notes and save and render
-document.querySelector('#create-note').addEventListener('click', (e) =>{
+//add to recipes and save and render
+document.querySelector('#create-recipe').addEventListener('click', (e) =>{
     const id = uuidv4()
     //timestamp with moment
     const timestamp = moment().valueOf()
-    notes.push({
+    recipes.push({
         id: id,
         title: '',
         body: '',
@@ -29,7 +29,7 @@ document.querySelector('#create-note').addEventListener('click', (e) =>{
         updatedAt: timestamp
     })
 
-    saveNotes(notes)
+    saveRecipes(recipes)
     location.assign(`/edit.html#${id}`)
 })
 
@@ -39,7 +39,7 @@ document.querySelector('#create-note').addEventListener('click', (e) =>{
 
 document.querySelector('#search-text').addEventListener('input', (e) =>{
     filters.searchText = e.target.value
-    renderNotes(notes, filters)
+    renderRecipes(recipes, filters)
 })
 
 
@@ -49,16 +49,16 @@ document.querySelector('#search-text').addEventListener('input', (e) =>{
 //for dropdown
 document.querySelector('#filter-by').addEventListener('change', (e) =>{
     filters.sortBy = e.target.value
-    renderNotes(notes, filters)
+    renderRecipes(recipes, filters)
     
 })
 
 
 //this is the live reload stuff
 window.addEventListener('storage', (e) =>{
-    if (e.key ==='notes'){
-        notes = JSON.parse(e.newValue)
-        renderNotes(notes, filters)
+    if (e.key ==='recipes'){
+        recipes = JSON.parse(e.newValue)
+        renderRecipes(recipes, filters)
     }
 })
 

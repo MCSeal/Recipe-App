@@ -1,31 +1,32 @@
-//read existing notes for LS
-getSavedNotes = () => {
-    const notesJSON = localStorage.getItem('notes')
-    return notesJSON !== null ? JSON.parse(notesJSON) : []
+
+//read existing recipes for LS
+getSavedRecipes = () => {
+    const recipesJSON = localStorage.getItem('recipes')
+    return recipesJSON !== null ? JSON.parse(recipesJSON) : []
 }
 
-//save the notes to ls
+//save the recipes to ls
 
-saveNotes = (notes) =>{
-    localStorage.setItem('notes', JSON.stringify(notes))
+saveRecipes = (recipes) =>{
+    localStorage.setItem('recipes', JSON.stringify(recipes))
 }
 
-//remove note
+//remove recipe
 
-removeNote = (id) => {
-    const noteIndex = notes.findIndex((note) => note.id === id)
+removeRecipe = (id) => {
+    const recipeIndex = recipes.findIndex((recipe) => recipe.id === id)
 
-    if (noteIndex > -1){
-        notes.splice(noteIndex, 1)
+    if (recipeIndex > -1){
+        recipes.splice(recipeIndex, 1)
     }
 
 }
 
 removeIngredient = (id) => {
-   const ingredientIndex = note.ingredients.findIndex((ingredient) => ingredient.id === id)
+   const ingredientIndex = recipe.ingredients.findIndex((ingredient) => ingredient.id === id)
 
     if (ingredientIndex > -1){
-        note.ingredients.splice(ingredientIndex, 1)
+        recipe.ingredients.splice(ingredientIndex, 1)
         location.reload();
     }
 
@@ -60,7 +61,7 @@ const generateIngredients = (ingredient) => {
     generateIngSummary();
     checkbox.addEventListener('change', () => {
             toggleHave(ingredient.id)
-            saveNotes(notes)
+            saveRecipes(recipes)
             
             
         })
@@ -71,7 +72,7 @@ const generateIngredients = (ingredient) => {
     todoEl.appendChild(removeButton)
     removeButton.addEventListener('click', () =>{
         removeIngredient(ingredient.id)
-        saveNotes(notes)
+        saveRecipes(recipes)
         
     })
     
@@ -83,48 +84,48 @@ const generateIngredients = (ingredient) => {
 //major ballbuster, have doesn't change even though it should
 toggleHave = (id) => {
     function findId(id, ingredients){
-        for (var i=0; i < note.ingredients.length; i++){
-            if (note.ingredients[i].id === id){
+        for (var i=0; i < recipe.ingredients.length; i++){
+            if (recipe.ingredients[i].id === id){
               return ingredients[i]
             }
         }
     
     }
-    let ingredient= findId(id, note.ingredients)
+    let ingredient= findId(id, recipe.ingredients)
     if (ingredient !== undefined){
         ingredient.have = !ingredient.have
         var summ = document.querySelector('.list-title')
-        const haveIngredients = note.ingredients.filter(function(ingredient){
+        const haveIngredients = recipe.ingredients.filter(function(ingredient){
         return ingredient.have == true
     })
         
-        summ.textContent = `You have ${haveIngredients.length} ingredients of ${note.ingredients.length} needed.`
-        //summary.textContent = `You have ${haveIngredients.length} ingredients of ${note.ingredients.length} needed.`
-        //renderIngredients(note.ingredients)
+        summ.textContent = `You have ${haveIngredients.length} ingredients of ${recipe.ingredients.length} needed.`
+        //summary.textContent = `You have ${haveIngredients.length} ingredients of ${recipe.ingredients.length} needed.`
+        //renderIngredients(recipe.ingredients)
         }
 }
 
 generateIngSummary = () => {
-    const haveIngredients = note.ingredients.filter(function(ingredient){
+    const haveIngredients = recipe.ingredients.filter(function(ingredient){
         return ingredient.have == true
     })
     var summ = document.querySelector('.list-title')
-    summ.textContent = `You have ${haveIngredients.length} ingredients of ${note.ingredients.length} needed.`
+    summ.textContent = `You have ${haveIngredients.length} ingredients of ${recipe.ingredients.length} needed.`
 }
 
 
 
 const renderIngredients = (ingredient) => {
-    const haveIngredients = note.ingredients.filter(function(ingredient){
+    const haveIngredients = recipe.ingredients.filter(function(ingredient){
         return ingredient.have == true
     })
    document.querySelector('.ingredients-body').appendChild(generateSummaryDOM(haveIngredients))
     
     
    const ingEl = document.querySelector('.ingredients-body')
-   filteredIng = note.ingredients
+   filteredIng = recipe.ingredients
    
-    note.ingredients.forEach((ingredient)=>{
+    recipe.ingredients.forEach((ingredient)=>{
         ingEl.appendChild(generateIngredients(ingredient))
     })
     
@@ -136,47 +137,47 @@ const renderNewIngredient = (ingredient) => {
 }
 
 
-// generate the dom structure for note
+// generate the dom structure for recipe
 
-generateNoteDom = (note) =>{
+generateRecipeDom = (recipe) =>{
     
-    const noteEl = document.createElement('a')
+    const recipeEl = document.createElement('a')
     const textEl = document.createElement('p')
     const statusEl = document.createElement('p')
 
-    if(note.title.length > 0){
-        textEl.textContent = note.title 
+    if(recipe.title.length > 0){
+        textEl.textContent = recipe.title 
     } else{
-        textEl.textContent = 'Unnamed note'
+        textEl.textContent = 'Unnamed recipe'
     }
     textEl.classList.add('list-item__title')
-    noteEl.appendChild(textEl)
+    recipeEl.appendChild(textEl)
 
     //setup link
-    noteEl.setAttribute('href', `/edit.html#${note.id}`)
-    noteEl.classList.add('list-item')
+    recipeEl.setAttribute('href', `/edit.html#${recipe.id}`)
+    recipeEl.classList.add('list-item')
 
-    statusEl.textContent = generateLastEdited(note.updatedAt)
+    statusEl.textContent = generateLastEdited(recipe.updatedAt)
     statusEl.classList.add('list-item__subtitle')
-    noteEl.appendChild(statusEl)
+    recipeEl.appendChild(statusEl)
 
-    return noteEl
+    return recipeEl
 }
 
  
 generateSummaryDOM = (haveIngredients) =>{
     const summary = document.createElement('h2')
     summary.classList.add('list-title')
-    summary.textContent = `You have ${haveIngredients.length} ingredients of ${note.ingredients.length} needed.`
+    summary.textContent = `You have ${haveIngredients.length} ingredients of ${recipe.ingredients.length} needed.`
     
     return summary
 }
 
 
 //sorts functions by that dropdown
- sortNotes = (notes, sortBy) => {
+ sortRecipes = (recipes, sortBy) => {
     if (sortBy === 'byEdited'){
-        return notes.sort((a, b) => {
+        return recipes.sort((a, b) => {
                 if (a.updatedAt > b.updatedAt) {
                     return -1
                 } else if (a.updatedAt < b.updatedAt) {
@@ -186,7 +187,7 @@ generateSummaryDOM = (haveIngredients) =>{
                 }
             })
     } else if (sortBy === 'byCreated') {
-        return notes.sort((a, b) => {
+        return recipes.sort((a, b) => {
             if (a.createdAt > b.createdAt){
                 return -1
             } else if (a.createdAt < b.createdAt) {
@@ -196,7 +197,7 @@ generateSummaryDOM = (haveIngredients) =>{
             }
         })
     } else if (sortBy === 'alphabetical') {
-        return notes.sort((a, b) => {
+        return recipes.sort((a, b) => {
             if (a.title.toLowerCase() < b.title.toLowerCase()){
                 return -1
             } else if (a.title.toLowerCase() > b.title.toLowerCase()){
@@ -206,31 +207,31 @@ generateSummaryDOM = (haveIngredients) =>{
             }
         })
     } else {
-        return notes
+        return recipes
     }
  }
 
 
 
-//render notes
-const renderNotes = (notes, filters) => {
-    const notesEl = document.querySelector('#notes')
-    notes = sortNotes(notes, filters.sortBy)
-    const filteredNotes = notes.filter((note) => note.title.toLowerCase().includes(filters.searchText.toLowerCase()))
+//render recipes
+const renderRecipes = (recipes, filters) => {
+    const recipesEl = document.querySelector('#recipes')
+    recipes = sortRecipes(recipes, filters.sortBy)
+    const filteredRecipes = recipes.filter((recipe) => recipe.title.toLowerCase().includes(filters.searchText.toLowerCase()))
 
-    notesEl.innerHTML = ''
+    recipesEl.innerHTML = ''
     
-    if (filteredNotes.length > 0){
-        filteredNotes.forEach((note) =>{
-            const noteEl = generateNoteDom(note)
-            notesEl.appendChild(noteEl)
+    if (filteredRecipes.length > 0){
+        filteredRecipes.forEach((recipe) =>{
+            const recipeEl = generateRecipeDom(recipe)
+            recipesEl.appendChild(recipeEl)
         })
     } else {
         const emptyMessage = document.createElement('p')
-        emptyMessage.textContent = 'No notes to show at the moment, try adding some.'
+        emptyMessage.textContent = 'No recipes to show at the moment, try adding some.'
         //make class to JS created variability
         emptyMessage.classList.add('empty-message')
-        notesEl.appendChild(emptyMessage)
+        recipesEl.appendChild(emptyMessage)
     }
 
 }
