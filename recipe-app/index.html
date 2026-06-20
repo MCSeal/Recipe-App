@@ -1,38 +1,43 @@
 <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Recipe App</title>
+    <link href="/styles/styles.css" rel="stylesheet">
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to recipes</a>
 
-<html>
-    <head>
-        <title>Recipe App</title>
-        <link href="/styles/styles.css" rel="stylesheet">
-    </head>
-    
-        <body>
-            <div class="header">
-                <div class="container">
-                    <h class="header__title">Recipe App</h1>
-                    <h2 class="header__subtitle">Help organize your recipes!</h2>
-                </div>
-            </div>
-            <div class="actions">
-                <div class="actions__container">
-                    <input id="search-text" type="text" class="input" placeholder="Filter Recipes">
-                    <select id="filter-by" class="dropdown">
-                        <option value="byEdited">Sort by last edited</option>
-                        <option value="byCreated">Sort by recently created</option>
-                        <option value="alphabetical">Sort alphabetically</option>
-                    </select>
-                </div>
-            </div>
+    <header class="header">
+      <div class="container">
+        <h1 class="header__title">Recipe App</h1>
+        <p class="header__subtitle">Help organize your recipes!</p>
+      </div>
+    </header>
 
-            <div class="container">
-                <div id="recipes"></div>
-                <button id="create-recipe" class="button"> Create New Recipe</button>
-            </div>
+    <div class="actions">
+      <div class="actions__container">
+        <label class="visually-hidden" for="search-text">Filter recipes by name</label>
+        <input id="search-text" type="text" class="input" placeholder="Filter recipes">
 
-            <script src="/scripts/uuid.js"></script>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment-with-locales.min.js"></script>
-            <script src="/scripts/recipe-functions.js"></script>
-            <script src="/scripts/recipe-app.js"></script>
-        </body>
-    
+        <label class="visually-hidden" for="filter-by">Sort recipes</label>
+        <select id="filter-by" class="dropdown">
+          <option value="byEdited">Sort by last edited</option>
+          <option value="byCreated">Sort by recently created</option>
+          <option value="alphabetical">Sort alphabetically</option>
+        </select>
+      </div>
+    </div>
+
+    <main id="main-content" class="container">
+      <div id="recipes" aria-live="polite"></div>
+      <button id="create-recipe" class="button">Create new recipe</button>
+    </main>
+
+    <script src="/scripts/uuid.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment-with-locales.min.js"></script>
+    <script src="/scripts/recipe-functions.js"></script>
+    <script src="/scripts/recipe-app.js"></script>
+  </body>
 </html>

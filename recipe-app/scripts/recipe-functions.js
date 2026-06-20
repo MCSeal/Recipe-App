@@ -1,38 +1,31 @@
 
-//read existing recipes for LS
-getSavedRecipes = () => {
+// pull whatever recipes are already saved in localStorage
+const getSavedRecipes = () => {
     const recipesJSON = localStorage.getItem('recipes')
     return recipesJSON !== null ? JSON.parse(recipesJSON) : []
 }
 
-//save the recipes to ls
-
-saveRecipes = (recipes) =>{
+// persist the full recipes array back to localStorage
+const saveRecipes = (recipes) => {
     localStorage.setItem('recipes', JSON.stringify(recipes))
 }
 
-//remove recipe
-
-removeRecipe = (id) => {
+const removeRecipe = (id) => {
     const recipeIndex = recipes.findIndex((recipe) => recipe.id === id)
 
-    if (recipeIndex > -1){
+    if (recipeIndex > -1) {
         recipes.splice(recipeIndex, 1)
     }
-
 }
 
-removeIngredient = (id) => {
-   const ingredientIndex = recipe.ingredients.findIndex((ingredient) => ingredient.id === id)
+const removeIngredient = (id) => {
+    const ingredientIndex = recipe.ingredients.findIndex((ingredient) => ingredient.id === id)
 
-    if (ingredientIndex > -1){
+    if (ingredientIndex > -1) {
         recipe.ingredients.splice(ingredientIndex, 1)
-        location.reload();
+        location.reload()
     }
-
 }
-
-
 
 const generateIngredients = (ingredient) => {
     const todoEl = document.createElement('label')
@@ -41,119 +34,88 @@ const generateIngredients = (ingredient) => {
     const checkbox = document.createElement('input')
     checkbox.classList.add('checkbox')
     const removeButton = document.createElement('button')
-    
-    
-        
-    //set up text
+
+    // text
     todoText.textContent = ingredient.ingredient
     containerEl.appendChild(todoText)
-    
-    //setup container
+
+    // container
     todoEl.classList.add('list-item')
     containerEl.classList.add('list-item__container')
     todoEl.appendChild(containerEl)
 
-//setup have box
+    // have/don't-have checkbox
     checkbox.setAttribute('type', 'checkbox')
     checkbox.checked = ingredient.have
-    
     containerEl.appendChild(checkbox)
-    generateIngSummary();
-    checkbox.addEventListener('change', () => {
-            toggleHave(ingredient.id)
-            saveRecipes(recipes)
-            
-            
-        })
 
-// //setup remove button
+    checkbox.addEventListener('change', () => {
+        toggleHave(ingredient.id)
+        saveRecipes(recipes)
+    })
+
+    // remove button
     removeButton.textContent = 'remove'
+    removeButton.setAttribute('type', 'button')
+    removeButton.setAttribute('aria-label', `Remove ${ingredient.ingredient}`)
     removeButton.classList.add('button', 'button--text')
     todoEl.appendChild(removeButton)
-    removeButton.addEventListener('click', () =>{
+    removeButton.addEventListener('click', () => {
         removeIngredient(ingredient.id)
         saveRecipes(recipes)
-        
     })
-    
+
     return todoEl
-
 }
 
-//toggle checkbox complete
-//major ballbuster, have doesn't change even though it should
-toggleHave = (id) => {
-    function findId(id, ingredients){
-        for (var i=0; i < recipe.ingredients.length; i++){
-            if (recipe.ingredients[i].id === id){
-              return ingredients[i]
-            }
-        }
-    
+// flips an ingredient's have/don't-have state and updates the summary line
+const toggleHave = (id) => {
+    const ingredient = recipe.ingredients.find((item) => item.id === id)
+    if (ingredient === undefined) return
+
+    ingredient.have = !ingredient.have
+    generateIngSummary()
+}
+
+// updates the "You have X of Y ingredients" line - called any time the
+// ingredient list changes (toggled, added, or removed)
+const generateIngSummary = () => {
+    const haveIngredients = recipe.ingredients.filter((ingredient) => ingredient.have === true)
+    const summary = document.querySelector('.list-title')
+    if (summary) {
+        summary.textContent = `You have ${haveIngredients.length} ingredients of ${recipe.ingredients.length} needed.`
     }
-    let ingredient= findId(id, recipe.ingredients)
-    if (ingredient !== undefined){
-        ingredient.have = !ingredient.have
-        var summ = document.querySelector('.list-title')
-        const haveIngredients = recipe.ingredients.filter(function(ingredient){
-        return ingredient.have == true
-    })
-        
-        summ.textContent = `You have ${haveIngredients.length} ingredients of ${recipe.ingredients.length} needed.`
-        //summary.textContent = `You have ${haveIngredients.length} ingredients of ${recipe.ingredients.length} needed.`
-        //renderIngredients(recipe.ingredients)
-        }
 }
 
-generateIngSummary = () => {
-    const haveIngredients = recipe.ingredients.filter(function(ingredient){
-        return ingredient.have == true
-    })
-    var summ = document.querySelector('.list-title')
-    summ.textContent = `You have ${haveIngredients.length} ingredients of ${recipe.ingredients.length} needed.`
-}
+const renderIngredients = () => {
+    const haveIngredients = recipe.ingredients.filter((ingredient) => ingredient.have === true)
+    const ingEl = document.querySelector('.ingredients-body')
 
+    ingEl.appendChild(generateSummaryDOM(haveIngredients))
 
-
-const renderIngredients = (ingredient) => {
-    const haveIngredients = recipe.ingredients.filter(function(ingredient){
-        return ingredient.have == true
-    })
-   document.querySelector('.ingredients-body').appendChild(generateSummaryDOM(haveIngredients))
-    
-    
-   const ingEl = document.querySelector('.ingredients-body')
-   filteredIng = recipe.ingredients
-   
-    recipe.ingredients.forEach((ingredient)=>{
+    recipe.ingredients.forEach((ingredient) => {
         ingEl.appendChild(generateIngredients(ingredient))
     })
-    
-
 }
 
+// adds one new ingredient row without re-rendering the whole list, then
+// refreshes the summary line - this used to be skipped here, which is
+// why the "have X of Y" count never updated when you added a fresh
+// ingredient (it only updated when you toggled an existing checkbox)
 const renderNewIngredient = (ingredient) => {
     document.querySelector('.ingredients-body').appendChild(generateIngredients(ingredient))
+    generateIngSummary()
 }
 
-
-// generate the dom structure for recipe
-
-generateRecipeDom = (recipe) =>{
-    
+const generateRecipeDom = (recipe) => {
     const recipeEl = document.createElement('a')
     const textEl = document.createElement('p')
     const statusEl = document.createElement('p')
 
-    if(recipe.title.length > 0){
-        textEl.textContent = recipe.title 
-    } else{
-        textEl.textContent = 'Unnamed recipe'
-    }
+    textEl.textContent = recipe.title.length > 0 ? recipe.title : 'Unnamed recipe'
     textEl.classList.add('list-item__title')
     recipeEl.appendChild(textEl)
 
-    //setup link
     recipeEl.setAttribute('href', `/edit.html#${recipe.id}`)
     recipeEl.classList.add('list-item')
 
@@ -164,80 +126,45 @@ generateRecipeDom = (recipe) =>{
     return recipeEl
 }
 
- 
-generateSummaryDOM = (haveIngredients) =>{
+const generateSummaryDOM = (haveIngredients) => {
     const summary = document.createElement('h2')
     summary.classList.add('list-title')
     summary.textContent = `You have ${haveIngredients.length} ingredients of ${recipe.ingredients.length} needed.`
-    
     return summary
 }
 
-
-//sorts functions by that dropdown
- sortRecipes = (recipes, sortBy) => {
-    if (sortBy === 'byEdited'){
-        return recipes.sort((a, b) => {
-                if (a.updatedAt > b.updatedAt) {
-                    return -1
-                } else if (a.updatedAt < b.updatedAt) {
-                    return 1
-                } else {
-                    return 0
-                }
-            })
+// sorts the recipe list according to the dropdown selection
+const sortRecipes = (recipes, sortBy) => {
+    if (sortBy === 'byEdited') {
+        return recipes.sort((a, b) => b.updatedAt - a.updatedAt)
     } else if (sortBy === 'byCreated') {
-        return recipes.sort((a, b) => {
-            if (a.createdAt > b.createdAt){
-                return -1
-            } else if (a.createdAt < b.createdAt) {
-                return 1
-            } else {
-                return 0
-            }
-        })
+        return recipes.sort((a, b) => b.createdAt - a.createdAt)
     } else if (sortBy === 'alphabetical') {
-        return recipes.sort((a, b) => {
-            if (a.title.toLowerCase() < b.title.toLowerCase()){
-                return -1
-            } else if (a.title.toLowerCase() > b.title.toLowerCase()){
-                return 1
-            } else {
-                return 0
-            }
-        })
+        return recipes.sort((a, b) => a.title.toLowerCase().localeCompare(b.title.toLowerCase()))
     } else {
         return recipes
     }
- }
+}
 
-
-
-//render recipes
 const renderRecipes = (recipes, filters) => {
     const recipesEl = document.querySelector('#recipes')
     recipes = sortRecipes(recipes, filters.sortBy)
     const filteredRecipes = recipes.filter((recipe) => recipe.title.toLowerCase().includes(filters.searchText.toLowerCase()))
 
     recipesEl.innerHTML = ''
-    
-    if (filteredRecipes.length > 0){
-        filteredRecipes.forEach((recipe) =>{
-            const recipeEl = generateRecipeDom(recipe)
-            recipesEl.appendChild(recipeEl)
+
+    if (filteredRecipes.length > 0) {
+        filteredRecipes.forEach((recipe) => {
+            recipesEl.appendChild(generateRecipeDom(recipe))
         })
     } else {
         const emptyMessage = document.createElement('p')
         emptyMessage.textContent = 'No recipes to show at the moment, try adding some.'
-        //make class to JS created variability
         emptyMessage.classList.add('empty-message')
         recipesEl.appendChild(emptyMessage)
     }
-
 }
 
-//generate last edited message
-
-generateLastEdited = (timestamp) => {
+const generateLastEdited = (timestamp) => {
     return `Last edited ${moment(timestamp).fromNow()}`
 }

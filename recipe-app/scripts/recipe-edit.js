@@ -1,88 +1,77 @@
 const titleElement = document.querySelector('#recipe-title')
-const bodyElement= document.querySelector('#recipe-body')
+const bodyElement = document.querySelector('#recipe-body')
 const removeElement = document.querySelector('#remove-recipe')
 const addIngredient = document.querySelector('#add-ingredient')
-
-const ingredientEl = document.querySelector('#ingredients-body')
 const dateElement = document.querySelector('#last-edited')
 const recipeId = location.hash.substring(1)
-let recipes = getSavedRecipes()
 
+let recipes = getSavedRecipes()
 let recipe = recipes.find((recipe) => recipe.id === recipeId)
 
-if (recipe === undefined){
+if (recipe === undefined) {
     location.assign('/index.html')
 }
-
-
 
 titleElement.value = recipe.title
 bodyElement.value = recipe.body
 dateElement.textContent = generateLastEdited(recipe.updatedAt)
 
-renderIngredients(recipe.ingredients)
+renderIngredients()
 
-//ingredientEl.textContent = generateIngredients(recipe.ingredients)
-
-//changes title when edited
+// title edits save as you type
 titleElement.addEventListener('input', (e) => {
-        recipe.title = e.target.value
-        recipe.updatedAt = moment().valueOf()
-        dateElement.textContent = generateLastEdited(recipe.updatedAt)
-        saveRecipes(recipes)
-    })
+    recipe.title = e.target.value
+    recipe.updatedAt = moment().valueOf()
+    dateElement.textContent = generateLastEdited(recipe.updatedAt)
+    saveRecipes(recipes)
+})
 
-//changes body when edited
-bodyElement.addEventListener('input', (e) =>{
+// recipe steps save as you type
+bodyElement.addEventListener('input', (e) => {
     recipe.body = e.target.value
     recipe.updatedAt = moment().valueOf()
     dateElement.textContent = generateLastEdited(recipe.updatedAt)
     saveRecipes(recipes)
 })
 
-//remove button
-removeElement.addEventListener('click', () =>{
+removeElement.addEventListener('click', () => {
     removeRecipe(recipe.id)
     saveRecipes(recipes)
     location.assign('/index.html')
 })
 
-//add ingredient button
-addIngredient.addEventListener('submit', (e) =>{
-    
-    let ingredientText = e.target.elements.text.value.trim()
+addIngredient.addEventListener('submit', (e) => {
     e.preventDefault()
-    
-    if (ingredientText.length != 0){
-        
+
+    const ingredientText = e.target.elements.text.value.trim()
+
+    if (ingredientText.length !== 0) {
         recipe.ingredients.push({
             id: uuidv4(),
             ingredient: ingredientText,
             have: false
         })
-        
+
         recipe.updatedAt = moment().valueOf()
         dateElement.textContent = generateLastEdited(recipe.updatedAt)
-        renderNewIngredient(recipe.ingredients[recipe.ingredients.length-1])
+        renderNewIngredient(recipe.ingredients[recipe.ingredients.length - 1])
         saveRecipes(recipes)
     }
-   
-        e.target.elements.text.value=''
 
+    e.target.elements.text.value = ''
 })
 
-
-//changes other tab(s) to reflect changes in edit page
-window.addEventListener('storage', (e) =>{
-    if (e.key === 'recipes'){
+// keeps this tab in sync if the recipe changes in another tab/window
+window.addEventListener('storage', (e) => {
+    if (e.key === 'recipes') {
         recipes = JSON.parse(e.newValue)
         recipe = recipes.find((recipe) => recipe.id === recipeId)
-        
-        if (!recipe){
+
+        if (!recipe) {
             location.assign('/index.html')
+            return
         }
-        
-        
+
         titleElement.value = recipe.title
         bodyElement.value = recipe.body
         dateElement.textContent = generateLastEdited(recipe.updatedAt)

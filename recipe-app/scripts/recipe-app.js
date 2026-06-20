@@ -1,12 +1,7 @@
-//what to do next-----
-//Recipe ingredients amount doesn't change when new ing added, only when clicked on first
-//fix that
-//2nd..... unnamed note if you make ingredient and it doesnt get assigned a tittle... this will not be alhpabetically arranged.. not sure if should fix
+// fixed: new ingredients didn't update the "have X of Y" count until you
+// toggled a checkbox - see renderNewIngredient in recipe-functions.js
 
-//%85 percent done
-
-
-let recipes= getSavedRecipes()
+let recipes = getSavedRecipes()
 
 const filters = {
     searchText: '',
@@ -15,10 +10,9 @@ const filters = {
 
 renderRecipes(recipes, filters)
 
-//add to recipes and save and render
-document.querySelector('#create-recipe').addEventListener('click', (e) =>{
+// add a blank recipe and jump straight to its edit page
+document.querySelector('#create-recipe').addEventListener('click', () => {
     const id = uuidv4()
-    //timestamp with moment
     const timestamp = moment().valueOf()
     recipes.push({
         id: id,
@@ -33,32 +27,21 @@ document.querySelector('#create-recipe').addEventListener('click', (e) =>{
     location.assign(`/edit.html#${id}`)
 })
 
-
-
-//change can be used when you click away, 'input' is as it goes in real time
-
-document.querySelector('#search-text').addEventListener('input', (e) =>{
+// live filter as you type
+document.querySelector('#search-text').addEventListener('input', (e) => {
     filters.searchText = e.target.value
     renderRecipes(recipes, filters)
 })
 
-
-//for name form.. contains prevent default example
-
-
-//for dropdown
-document.querySelector('#filter-by').addEventListener('change', (e) =>{
+document.querySelector('#filter-by').addEventListener('change', (e) => {
     filters.sortBy = e.target.value
     renderRecipes(recipes, filters)
-    
 })
 
-
-//this is the live reload stuff
-window.addEventListener('storage', (e) =>{
-    if (e.key ==='recipes'){
+// keeps this tab in sync if recipes change in another tab/window
+window.addEventListener('storage', (e) => {
+    if (e.key === 'recipes') {
         recipes = JSON.parse(e.newValue)
         renderRecipes(recipes, filters)
     }
 })
-
